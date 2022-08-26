@@ -49,7 +49,9 @@ fn main() {
     let mut instruction_accounts = Vec::new();
     let instruction_data = {
         let input = load_accounts(&Path::new("../solana-contracts/helloworld/input.json")).unwrap();
+
         for account_info in input.accounts {
+            println!("Account owner: {:?}", &account_info.owner);
             let mut account = AccountSharedData::new(
                 account_info.lamports,
                 account_info.data.len(),
@@ -95,7 +97,8 @@ fn main() {
     let compute_meter = invoke_context.get_compute_meter();
     let mut instruction_meter = ThisInstructionMeter { compute_meter };
 
-    let program = "../solana-contracts/helloworld/target/deploy/helloworld.so";
+    let program =
+        "../solana-contracts/helloworld/target/bpfel-unknown-unknown/release/helloworld.so";
     let mut file = File::open(&Path::new(program)).unwrap();
     let mut magic = [0u8; 4];
     file.read_exact(&mut magic).unwrap();
@@ -234,11 +237,12 @@ struct Input {
 }
 
 fn load_accounts(path: &Path) -> Result<Input> {
-    let file = File::open(path).unwrap();
-    let input: Input = serde_json::from_reader(file)?;
-    eprintln!("Program input:");
-    eprintln!("accounts {:?}", &input.accounts);
-    eprintln!("instruction_data {:?}", &input.instruction_data);
-    eprintln!("----------------------------------------");
+    let mut file = File::open(path).unwrap();
+    let mut content = String::new();
+    file.read_to_string(&mut content).unwrap();
+    let input: Input = serde_json::from_str(&content)?;
+    println!("Program input: {:?}", &path);
+    println!("accounts {:?}", &input.accounts);
+    println!("instruction_data {:?}", &input.instruction_data);
     Ok(input)
 }
