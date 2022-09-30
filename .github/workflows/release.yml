@@ -1,0 +1,58 @@
+name: Main workflow
+
+on:
+  workflow_dispatch:                # Manually dispatch
+  # push:
+    # branches:
+    #   - develop
+    # tags:
+    #   - '*'
+
+jobs:
+  release:
+    name: Build and publish binaries
+
+    runs-on: ubuntu-latest
+
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
+
+    steps:
+
+    - uses: actions/checkout@v3                 # Git toolchain to check out code
+
+    - uses: actions-rs/toolchain@v1             # Rust toolchain
+      with:
+        toolchain: 1.63.0
+
+    - uses: webfactory/ssh-agent@v0.5.4
+      with:
+        ssh-private-key: |
+          ${{ secrets.SSH_PRIVATE_KEY_RUST_EVM }}
+          ${{ secrets.SSH_PRIVATE_KEY_REVM }}
+
+    - name: Build for release
+      run:
+        cargo build --release -F legacy
+
+    - name: Read .release-note and use it as a body of new release
+      id: read_release
+      shell: bash
+      run: |
+        r=$(cat .release-note)
+        r="${r//'%'/'%25'}"   
+        r="${r//$'\n'/'%0A'}" 
+        r="${r//$'\r'/'%0D'}" 
+        echo "::set-output name=RELEASE_BODY::$r"
+
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: target/release/libtinyevm.so
+        asset_name: libtinyevm.so
+        tag: ${{ github.ref }}
+        overwrite: true
+        body: |
+          ${{ steps.read_release.outputs.RELEASE_BODY }}  # <--- Use environment variables that was created earlier
+

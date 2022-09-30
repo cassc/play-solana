@@ -1,0 +1,46 @@
+name: Main workflow
+
+on:
+  #  branches: [ develop ]
+  # pull_request:
+  #   branches: [ develop ]
+  workflow_dispatch:                # Manually dispatch
+  # schedule:
+  #   - cron: 0 0 * * *               # Scheduled dispatch at the end of everyday
+
+env:
+  POLY_HOME: /tmp/poly
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v3
+
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.9"
+
+    - uses: actions/setup-java@v2
+      with:
+        java-version: 11
+        distribution: zulu
+      
+    # - uses: DeLaGuardo/setup-clojure@3.7
+    #   with:
+    #     cli: 1.10.3.1058
+
+    - name: Install polylith
+      run: |
+        mkdir -p $POLY_HOME
+        curl -L https://github.com/polyfy/polylith/releases/download/v0.2.15-alpha/poly-0.2.15-alpha.jar -o $POLY_HOME/poly.jar
+
+    - name: Test downloaded binary works 
+      run: python3 test-exe-in-github-action.py
+
+        
+        
