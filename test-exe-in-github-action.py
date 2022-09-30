@@ -41,4 +41,4 @@ def execute(command, cwd=None):
 
 if __name__ == '__main__':
     poly = '$POLY_HOME/poly.jar'
-    execute(f'java -jar {poly} info')
+    execute(f'java -jar {poly} info', '/home')
