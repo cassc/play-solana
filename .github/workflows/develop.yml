@@ -13,7 +13,7 @@ env:
   POLY_HOME: /tmp/poly
 
 jobs:
-  build:
+  test-exeternal-binary:
 
     runs-on: ubuntu-latest
 

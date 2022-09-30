@@ -2,7 +2,8 @@ import subprocess
 import logging
 import sys
 
-logging.basicConfig(stream=sys.stdout, format='%(filename)s %(lineno)3d - %(message)s', level=LOG_LEVEL)
+
+logging.basicConfig(stream=sys.stdout, format='%(filename)s %(lineno)3d - %(message)s', level=logging.DEBUG)
 
 
 def wrap_except(func):
