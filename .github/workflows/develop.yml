@@ -2,8 +2,9 @@ name: Main workflow
 
 on:
   #  branches: [ develop ]
-  # pull_request:
-  #   branches: [ develop ]
+  push:
+    branches:
+      - '*'
   workflow_dispatch:                # Manually dispatch
   # schedule:
   #   - cron: 0 0 * * *               # Scheduled dispatch at the end of everyday
